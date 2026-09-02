@@ -14,15 +14,15 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(lib);
     const upstream = b.dependency("upstream", .{});
 
-    lib.addIncludePath(upstream.path("src/common"));
-    lib.addIncludePath(upstream.path("src/liblzma/api"));
-    lib.addIncludePath(upstream.path("src/liblzma/check"));
-    lib.addIncludePath(upstream.path("src/liblzma/common"));
-    lib.addIncludePath(upstream.path("src/liblzma/rangecoder"));
-    lib.addIncludePath(upstream.path("src/liblzma/delta"));
-    lib.addIncludePath(upstream.path("src/liblzma/lz"));
-    lib.addIncludePath(upstream.path("src/liblzma/lzma"));
-    lib.addIncludePath(upstream.path("src/liblzma/simple"));
+    lib.root_module.addIncludePath(upstream.path("src/common"));
+    lib.root_module.addIncludePath(upstream.path("src/liblzma/api"));
+    lib.root_module.addIncludePath(upstream.path("src/liblzma/check"));
+    lib.root_module.addIncludePath(upstream.path("src/liblzma/common"));
+    lib.root_module.addIncludePath(upstream.path("src/liblzma/rangecoder"));
+    lib.root_module.addIncludePath(upstream.path("src/liblzma/delta"));
+    lib.root_module.addIncludePath(upstream.path("src/liblzma/lz"));
+    lib.root_module.addIncludePath(upstream.path("src/liblzma/lzma"));
+    lib.root_module.addIncludePath(upstream.path("src/liblzma/simple"));
 
     lib.root_module.addCMacro("HAVE_STDBOOL_H", "1");
     lib.root_module.addCMacro("HAVE_STDINT_H", "1");
@@ -41,27 +41,27 @@ pub fn build(b: *std.Build) void {
     // <https://github.com/winlibs/liblzma/blob/e41fdf12b0c0be6d4910f41c137deacc24279c9c/src/liblzma/common/filter_common.c>
     if (arch.isX86()) {
         lib.root_module.addCMacro("HAVE_DECODER_X86", "1");
-        lib.addCSourceFile(.{
+        lib.root_module.addCSourceFile(.{
             .file = upstream.path("src/liblzma/simple/x86.c"),
         });
     } else if (arch.isArm()) {
         lib.root_module.addCMacro("HAVE_DECODER_ARM", "1");
-        lib.addCSourceFile(.{
+        lib.root_module.addCSourceFile(.{
             .file = upstream.path("src/liblzma/simple/arm.c"),
         });
     } else if (arch.isAARCH64()) {
         lib.root_module.addCMacro("HAVE_DECODER_ARM64", "1");
-        lib.addCSourceFile(.{
+        lib.root_module.addCSourceFile(.{
             .file = upstream.path("src/liblzma/simple/arm64.c"),
         });
     } else if (arch.isRISCV()) {
         lib.root_module.addCMacro("HAVE_DECODER_RISCV", "1");
-        lib.addCSourceFile(.{
+        lib.root_module.addCSourceFile(.{
             .file = upstream.path("src/liblzma/simple/riscv.c"),
         });
     }
 
-    lib.addCSourceFiles(.{
+    lib.root_module.addCSourceFiles(.{
         .root = upstream.path("."),
         .files = &.{
             "src/liblzma/check/check.c",
@@ -89,5 +89,5 @@ pub fn build(b: *std.Build) void {
         },
     });
 
-    lib.linkLibC();
+    lib.root_module.link_libc = true;
 }
